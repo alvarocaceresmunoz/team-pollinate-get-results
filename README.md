@@ -2,9 +2,9 @@
 Utility script for the TeamPollinATE project (Goulson Lab, University of Sussex)
 
 # What it does
-1. Gets data of all users from the project database (containig allotment recordings and results from signup surveys)
-2. turns it into a local .csv file that can be read by a spreadsheet program (Excel, Google Spreadsheets...)
-3. Uploads this file to Firebase Cloud Storage (so
+1. Get data of all users from the project database (containig allotment recordings and results from signup surveys)
+2. Turn it into a local .csv file that can be read by a spreadsheet program (Excel, Google Spreadsheets...)
+3. Upload this file to Firebase Cloud Storage (so
 
 # Requirements
 This script has been tested using the following setup:
@@ -21,11 +21,13 @@ This script has been tested using the following setup:
 4. Make the script executable: type `chmod +x ./run.js` then press `Enter`
 
 # Usage
-- To get help, type `./run -h` or `./run --help`
+- To get help, type `./run --help` (or `./run -h` for short) 
 - To get data from the database with real users, type `./run --database production` (or `./run -d production` for short)
 - To get data from a test database, type `./run --database development` (or `./run -d development` for short)
 
 # Scheduling this script
+*Warning: in order to make this work, the script needs to be fixed so that it can exit on its own, rather than pressing Ctr-C.*
+
 If you want to schedule data gathering from the database (i.e. executing the script at a given date periodically), you can do so by using [crontab](https://en.wikipedia.org/wiki/Cron), a job scheduler for Linux.
 
 You will need to edit a crontab file by typing `crontab -e` on the terminal. This will open the crontab configuration file in a text editor. The crontab file specifies how often do you want the job to be executed. For example, if you want to gather data every 6th of October at 17:01 (read _"at minute 01, hour 17, day 6, month 10, of every (*) year"_, you would have to paste this into your crontab file:
