@@ -30,9 +30,11 @@ This script has been tested using the following setup:
 
 If you want to schedule data gathering from the database (i.e. executing the script at a given date periodically), you can do so by using [crontab](https://en.wikipedia.org/wiki/Cron), a job scheduler for Linux.
 
-You will need to edit a crontab file by typing `crontab -e` on the terminal. This will open the crontab configuration file in a text editor. The crontab file specifies how often do you want the job to be executed. For example, if you want to gather data every 6th of October at 17:01 (read _"at minute 01, hour 17, day 6, month 10, of every (*) year"_, you would have to paste this into your crontab file:
+You will need to edit a crontab file by typing `crontab -e` on the terminal. This will open the crontab configuration file in a text editor. The crontab file specifies how often do you want the job to be executed. For example, if you want to gather data every 6th of October at 17:01, you would have to paste this into your crontab file:
 
 ```01 17 6 10 * pathToTheScript/run --database production```
+
+(This would be read as: _"at minute 01, hour 17, day 6, month 10, of every (*) year, execute_ `run --database production` _"_)
 
 # To-do
 - Make the script send an email to researchers with the .csv file attached
