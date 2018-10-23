@@ -1,0 +1,165 @@
+#!/usr/bin/env node
+
+/* Required packages */
+
+const firebase = require('firebase-admin')
+const papaparse = require('papaparse')
+const fs = require('fs')
+const resultFilePath = './results.csv'
+const script = require('commander')
+
+
+
+
+/* Script-related details */
+
+var typeValue
+
+script
+  .version('0.1.0')
+  .option(
+    '-d --database <type>',
+    'select either real users databse ("production") or test database ("development")',
+    /^(production|development)$/i,
+    'development'
+  )
+  .parse(process.argv)
+
+console.log('Selected database: ', script.database);
+
+
+
+/* Database-related details */
+
+const config = {
+  'production': {
+    serviceKey:    './keys/service-key-production.json',
+    storageBucket: './keys/storage-bucket-production.json',
+    databaseURL:   './keys/database-url-production.json'
+  },
+  'development': {
+    serviceKey:    './keys/service-key-development.json',
+    storageBucket: './keys/storage-bucket-development.json',
+    databaseURL:   './keys/database-url-development.json'
+  }
+}
+
+const serviceAccount = require(config[script.database].serviceKey)
+const storageBucket  = require(config[script.database].storageBucket)
+const databaseURL    = require(config[script.database].databaseURL)
+
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
+  storageBucket: storageBucket,
+  databaseURL: databaseURL
+})
+
+const dbRef = firebase.database().ref()
+const cropsReference = dbRef.child('crops')
+const signUpSurveysReference = dbRef.child('signUpSurveys')
+
+
+
+
+/* Available functions */
+
+function getArrayFromDb(cropsSnapshot, surveysSnapshot) {
+  var cropRecordings    = cropsSnapshot.val()
+  var surveysRecordings = surveysSnapshot.val()
+
+  var header = [
+    'Timestamp',
+    'Name',
+    'Email',
+    'Allotment site',
+    'Allotment size (quantity)',
+    'Allotment size (unit of measurement)',
+    'Number of different crops'
+  ]
+
+  var maxNumberOfCrops = 0
+  for (let userUID in cropRecordings) {
+    var row = []
+
+    var userCropData   = cropRecordings   [userUID]
+    userCropData.crops = userCropData.crops.filter(crop => crop.quantity != 0)
+    var userSurveyData = surveysRecordings[userUID]
+
+    if (userCropData.crops.length > maxNumberOfCrops) {
+      var cropColumnGroupsToAdd = userCropData.crops.length - maxNumberOfCrops
+
+      maxNumberOfCrops = userCropData.crops.length
+
+      for (var i = 0; i < cropColumnGroupsToAdd; i++)
+        header.push('Crop Type', 'Quantity', 'Unit of measurement')
+    }
+
+    row.push(
+      getDdMmYyyyDateFromISO8601Date(userCropData.timestamp),
+      userSurveyData.name,
+      userSurveyData.email,
+      userSurveyData.allotmentSite,
+      userSurveyData.area,
+      userSurveyData.areaUnits,
+      userCropData.crops.length
+    )
+
+    userCropData.crops.forEach(crop =>
+      row.push(crop.cropType, crop.quantity, crop.unitOfMeasurement)
+    )
+
+    csvArray.push(row)
+  }
+
+  csvArray.unshift(header)
+
+  return Promise.resolve(csvArray)
+}
+
+function getCsvFromArray(csvArray) {
+  fs.writeFile(
+    resultFilePath,
+    papaparse.unparse(csvArray, { header: true }),
+    err => {
+      if (err) console.log('[ERROR!] getCsvFromArray:\n' + err)
+    }
+  )
+  return Promise.resolve(resultFilePath)
+}
+
+function getDdMmYyyyDateFromISO8601Date(iso8601Date) {
+  return iso8601Date.split('T')[0]
+}
+
+function uploadCsv(resultFilePath) {
+  firebase
+    .storage()
+    .bucket()
+    .upload(resultFilePath)
+    .catch(err => {
+      if (err) console.log('[ERROR!] uploadCsv:\n' + err)
+    })
+}
+
+
+
+
+/* Main section of the script*/
+
+var csvArray = []
+
+cropsReference
+  .once('value')
+  .then(console.log('Loading crop yield data from the Firebase database...'))
+  .then(cropsSnapshot => {
+    signUpSurveysReference
+      .once('value')
+      .then(surveysSnapshot => getArrayFromDb(cropsSnapshot, surveysSnapshot))
+      .then(console.log('Converting data to .csv file...'))
+      .then(csvArray => getCsvFromArray(csvArray))
+      .then(console.log('File "results.csv" generated in this directory. Uploading .csv file to Firebase cloud storage...'))
+      .then(resultFilePath => uploadCsv(resultFilePath))
+      .then(console.log('Done! Press Ctrl+C to exit.'))
+      .catch(err => console.log('[ERROR!] inner: \n' + err))
+  })
+  .catch(err => console.log('[ERROR!] main: \n' + err))
