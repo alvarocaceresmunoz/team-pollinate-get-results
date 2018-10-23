@@ -1,26 +1,60 @@
 # team-pollinate-get-results
+
 Utility script for the TeamPollinATE project (Goulson Lab, University of Sussex)
 
 # What it does
-This small script
+
 1. Gets data of all users from the project database (containig allotment recordings and results from signup surveys)
 2. turns it into a local .csv file that can be read by a spreadsheet program (Excel, Google Spreadsheets...)
 3. Uploads this file to Firebase Cloud Storage (so
 
 # Requirements
+
 This script has been tested using the following setup:
 - Operating system: Ubuntu 16.04.5 64-bit
 - Software
   - node v8.11.3
   - yarn v1.10.1
 
-# Usage
-Clone this repository. Using the terminal, go to the root directory of this project and type
-```console
-$ yarn add
+# Installation
+
+1. Open a terminal emulator
+2. Clone this repository to get the script: in the terminal, type
 ```
-then press `Enter`. This will add all the Node modules required by the script.
+git clone https://github.com/alvarocaceresmunoz/team-pollinate-get-results
+```
+then press `Enter`
+2. Go to the repository root directory: type
+```
+cd team-pollinate-get-results
+```
+then press `Enter`
+3. Install the Node.js modules required by the script: type
+```console
+yarn add
+```
+then press `Enter`
+4. Make the script executable: type
+```console
+chmod +x ./run.js
+```
+then press `Enter`
+
+# Usage
+
+- To get help, type `./run -h` or `./run --help`
+- To get data from the database with real users, type `./run --database production` (or `./run -d production` for short)
+- To get data from a test database, type `./run --database development` (or `./run -d development` for short)
+
+# Scheduling this script
+
+If you want to schedule data gathering from the database (i.e. executing the script at a given date periodically), you can do so by using [crontab](https://en.wikipedia.org/wiki/Cron), a job scheduler for Linux.
+
+You will need to edit a crontab file by typing `crontab -e` on the terminal. This will open the crontab configuration file in a text editor. The crontab file specifies how often do you want the job to be executed. An example of crontab configuration for gathering data every 6th of October at 17:01 (read _"at minute 01, hour 17, day 6, month 10, of every (*) year"_:
+```01 17 6 10 * pathToTheScript/run --database production```
 
 # To-do
-- Email researchers with the .csv file attached
-- Store this script in a 
+
+- Make the script send an email to researchers with the .csv file attached
+- Upload the script to the cloud (eg. AWS, OpenShift, Heroku...)
+- Schedule the script in the selected cloud service
