@@ -26,7 +26,7 @@ This script has been tested using the following setup:
 - To get data from a test database, type `./run --database development` (or `./run -d development` for short)
 
 # Scheduling this script
-*Warning: in order to make this work, the script needs to be fixed so that it can exit on its own, rather than pressing Ctr-C.*
+*Warning: in order to make this work, the script needs to be fixed so that it can exit on its own, rather than having to press Ctr-C.*
 
 If you want to schedule data gathering from the database (i.e. executing the script at a given date periodically), you can do so by using [crontab](https://en.wikipedia.org/wiki/Cron), a job scheduler for Linux.
 
