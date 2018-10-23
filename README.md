@@ -18,7 +18,7 @@ This script has been tested using the following setup:
 1. Open a terminal emulator
 2. Clone this repository to get the script: in the terminal, type `git clone https://github.com/alvarocaceresmunoz/team-pollinate-get-results.git` then press `Enter`
 2. Go to the repository root directory: type `cd team-pollinate-get-results` then press `Enter`
-3. Install the Node.js modules required by the script: type `console yarn add` then press `Enter`
+3. Install the Node.js modules required by the script: type `yarn` then press `Enter`
 4. Make the script executable: type `chmod +x ./run.js` then press `Enter`
 
 # Usage
