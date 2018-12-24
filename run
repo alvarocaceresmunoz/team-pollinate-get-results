@@ -29,6 +29,7 @@ console.log('Selected database: ', script.database);
 
 
 
+
 /* Database-related details */
 
 const config = {
@@ -71,7 +72,7 @@ function getArrayFromDb(cropsSnapshot, surveysSnapshot) {
     'Timestamp',
     'Name',
     'Email',
-    'Allotment site',
+    // 'Allotment site',
     'Allotment size (quantity)',
     'Allotment size (unit of measurement)',
     'Number of different crops'
@@ -98,7 +99,7 @@ function getArrayFromDb(cropsSnapshot, surveysSnapshot) {
       getDdMmYyyyDateFromISO8601Date(userCropData.timestamp),
       userSurveyData.name,
       userSurveyData.email,
-      userSurveyData.allotmentSite,
+      // userSurveyData.allotmentSite,
       userSurveyData.area,
       userSurveyData.areaUnits,
       userCropData.crops.length
